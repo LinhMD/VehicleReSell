@@ -11,10 +11,10 @@ public class SystemLog
 
     public DateTime Date { get; set; } = DateTime.Now;
 
-    public string OldRecord { get; set; } = string.Empty;
+    public string OldRecord { get; set; }  
 
-    public string NewRecord { get; set; } = string.Empty;
+    public string NewRecord { get; set; }  
 
-    public string RecordType { get; set; } = string.Empty;
+    public string RecordType { get; set; }  
 
 }

@@ -18,5 +18,5 @@ public class CreateLine : CreateDto, ICreateRequest<TransactionLine>
     [Range(0, long.MaxValue)]
     public long Amount { get; set; }
 
-    public string Note { get; set; } = string.Empty;
+    public string? Note { get; set; }  
 }

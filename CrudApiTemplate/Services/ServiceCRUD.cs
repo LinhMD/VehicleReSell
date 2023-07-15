@@ -69,7 +69,8 @@ public class ServiceCrud<TModel> : IServiceCrud<TModel> where TModel : class
         catch (DbUpdateException e)
         {
             var exceptionMessage = e.InnerException?.Message ?? "";
-            Logger.LogError(e.InnerException, exceptionMessage);
+            exceptionMessage.Dump();
+            Logger.LogError(e.InnerException?.ToString() ?? $"");
             if (exceptionMessage.Contains("duplicate"))
             {
                 var dupValue = exceptionMessage.Substring(exceptionMessage.IndexOf('(') + 1,
@@ -77,6 +78,7 @@ public class ServiceCrud<TModel> : IServiceCrud<TModel> where TModel : class
                 throw new DbQueryException($"Duplicate value: {dupValue}", DbError.Create);
             }
             throw new DbQueryException($"Error create {typeof(TModel).Name}  with message: {exceptionMessage}.", DbError.Create);
+            
         }
         return model;
     }
@@ -85,7 +87,7 @@ public class ServiceCrud<TModel> : IServiceCrud<TModel> where TModel : class
     {
         var model = Get(id);
 
-        var oldRcord = JsonSerializer.Serialize(model);
+        var oldRecord = JsonSerializer.Serialize(model);
         updateRequest.UpdateModel(ref model, UnitOfWork);
         model.Validate();
         try
@@ -95,7 +97,7 @@ public class ServiceCrud<TModel> : IServiceCrud<TModel> where TModel : class
             {
                 NewRecord = JsonSerializer.Serialize(model),
                 User = updateBy,
-                OldRecord = oldRcord,
+                OldRecord = oldRecord,
                 RecordType = typeof(TModel).Name,
             });
         }

@@ -130,4 +130,12 @@ public class Repository<TModel> : IRepository<TModel> where TModel : class
     {
         return Models.AsQueryable();
     }
+
+    public async Task<TModel> UpdateFieldAsync(Expression<Func<TModel, dynamic>> fieldExpression, TModel model)
+    {
+        Context.Entry(model).Property(fieldExpression).IsModified = true;
+        await Context.SaveChangesAsync();
+        await Context.Entry(model).GetDatabaseValuesAsync();
+        return model;
+    }
 }

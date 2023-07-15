@@ -1,3 +1,4 @@
+using CrudApiTemplate.CustomBinding;
 using CrudApiTemplate.CustomException;
 using CrudApiTemplate.Model;
 using CrudApiTemplate.Repository;
@@ -5,6 +6,7 @@ using CrudApiTemplate.Request;
 using CrudApiTemplate.Response;
 using CrudApiTemplate.Services;
 using CrudApiTemplate.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
@@ -14,14 +16,16 @@ using VehicleReSell.Data.Model;
 namespace VehicleReSell.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]s")]
 public class UserController : ControllerBase
 {
-        private readonly IServiceCrud<User> _userService;
+    private readonly IServiceCrud<User> _userService;
     private readonly IRepository<User> _repo;
+    private IUnitOfWork _work;
 
     public UserController(IUnitOfWork work, ILogger<UserController> logger)
     {
+        _work = work;
         _userService = new ServiceCrud<User>(work, logger);
         _repo = work.Get<User>();
     }
@@ -30,7 +34,7 @@ public class UserController : ControllerBase
     [SwaggerResponse(200,"User view", typeof(UserSView))]
     public async Task<ActionResult<UserSView>> Get(int id)
     {
-        return Ok(await _repo.Find<UserSView>(User => User.Id == id).FirstOrDefaultAsync() ??
+        return Ok(await _repo.Find<UserSView>(user => user.Id == id).FirstOrDefaultAsync() ??
                   throw new ModelNotFoundException($"Not Found {nameof(User)} with id {id}"));
     }
     [HttpGet]
@@ -68,5 +72,12 @@ public class UserController : ControllerBase
     {
         return Ok(await _userService.UpdateAsync(id, new SoftDeleteDto<User>()));
     }
-
+    [HttpGet("current")]
+    [Authorize]
+    public async Task<IActionResult> Current([FromClaim("Id")]int? id)
+    {
+        var user = await _repo.Find<UserSView>(cus => cus.Id == id).FirstOrDefaultAsync() ??
+                   throw new ModelNotFoundException($"Not Found {nameof(Data.Model.User)} with id {id}");
+        return Ok(user);
+    }
 }

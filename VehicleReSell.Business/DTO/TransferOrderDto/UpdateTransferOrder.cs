@@ -10,11 +10,12 @@ public class UpdateTransferOrder : UpdateDto, IUpdateRequest<TransferOrder>
     public int? TransactionId { get; set; }
 
     public int? FromLocationId { get; set; }
-    public string FromLocationAddress { get; set; } = string.Empty;
+    public string FromLocationAddress { get; set; }  
     public DateTime? LeaveDate { get; set; }
 
 
     public int? ToLocationId { get; set; }
-    public string ToLocationAddress { get; set; } = string.Empty;
+    public string ToLocationAddress { get; set; }  
     public DateTime? ReceiveDate { get; set; }
+    public ApprovalStatus? ApprovalStatus { get; set; }
 }

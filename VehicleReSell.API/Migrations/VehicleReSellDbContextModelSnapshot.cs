@@ -22,6 +22,37 @@ namespace VehicleReSell.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("CrudApiTemplate.Model.SystemLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NewRecord")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldRecord")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecordType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("User")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SystemLogs");
+                });
+
             modelBuilder.Entity("VehicleReSell.Data.Model.Assessor", b =>
                 {
                     b.Property<int>("Id")
@@ -204,8 +235,14 @@ namespace VehicleReSell.API.Migrations
                     b.Property<int?>("DeleteById")
                         .HasColumnType("int");
 
+                    b.Property<string>("Img")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ItemReceiptStatus")
                         .HasColumnType("int");
+
+                    b.Property<string>("Request")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("StaffId")
                         .HasColumnType("int");
@@ -222,6 +259,9 @@ namespace VehicleReSell.API.Migrations
                     b.Property<int?>("UpdateById")
                         .HasColumnType("int");
 
+                    b.Property<int?>("VehicleOwnerId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApproverId");
@@ -231,6 +271,8 @@ namespace VehicleReSell.API.Migrations
                     b.HasIndex("StaffId");
 
                     b.HasIndex("TransactionId");
+
+                    b.HasIndex("VehicleOwnerId");
 
                     b.ToTable("ItemReceipts");
                 });
@@ -242,6 +284,9 @@ namespace VehicleReSell.API.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("ApprovalStatus")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("CreateAt")
                         .HasColumnType("datetime2");
@@ -257,6 +302,9 @@ namespace VehicleReSell.API.Migrations
 
                     b.Property<int?>("DeleteById")
                         .HasColumnType("int");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SellerId")
                         .HasColumnType("int");
@@ -390,55 +438,6 @@ namespace VehicleReSell.API.Migrations
                     b.ToTable("Staffs");
                 });
 
-            modelBuilder.Entity("VehicleReSell.Data.Model.SystemLog", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<DateTime?>("CreateAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreateById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeleteAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("DeleteById")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NewRecord")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OldRecord")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RecordType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdateAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdateById")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SystemLogs");
-                });
-
             modelBuilder.Entity("VehicleReSell.Data.Model.Transaction", b =>
                 {
                     b.Property<int>("Id")
@@ -446,9 +445,6 @@ namespace VehicleReSell.API.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("ApprovalStatus")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("CreateAt")
                         .HasColumnType("datetime2");
@@ -516,7 +512,6 @@ namespace VehicleReSell.API.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Note")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("PICId")
@@ -560,6 +555,9 @@ namespace VehicleReSell.API.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("ApprovalStatus")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("CreateAt")
                         .HasColumnType("datetime2");
@@ -629,6 +627,9 @@ namespace VehicleReSell.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("AvatarLink")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("CreateAt")
                         .HasColumnType("datetime2");
 
@@ -641,8 +642,15 @@ namespace VehicleReSell.API.Migrations
                     b.Property<int?>("DeleteById")
                         .HasColumnType("int");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Hash")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Role")
@@ -666,6 +674,9 @@ namespace VehicleReSell.API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -708,11 +719,20 @@ namespace VehicleReSell.API.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("FuelType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GearType")
+                        .HasColumnType("int");
+
                     b.Property<string>("Imgs")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Manufacture")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ManufactureYear")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -738,6 +758,9 @@ namespace VehicleReSell.API.Migrations
                     b.Property<int?>("VehicleOwnerId")
                         .HasColumnType("int");
 
+                    b.Property<int>("VehicleStatus")
+                        .HasColumnType("int");
+
                     b.Property<string>("Videos")
                         .HasColumnType("nvarchar(max)");
 
@@ -753,6 +776,28 @@ namespace VehicleReSell.API.Migrations
                     b.HasIndex("WareHouseId");
 
                     b.ToTable("Vehicles");
+                });
+
+            modelBuilder.Entity("VehicleReSell.Data.Model.VehicleImg", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("VehicleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("VehicleImg");
                 });
 
             modelBuilder.Entity("VehicleReSell.Data.Model.VehicleOwner", b =>
@@ -814,13 +859,16 @@ namespace VehicleReSell.API.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("AvailableCapacity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("CreateAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("CreateById")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CurrentCapacity")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DeleteAt")
@@ -908,6 +956,11 @@ namespace VehicleReSell.API.Migrations
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("VehicleReSell.Data.Model.VehicleOwner", "VehicleOwner")
+                        .WithMany()
+                        .HasForeignKey("VehicleOwnerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Approver");
 
                     b.Navigation("Assessor");
@@ -915,6 +968,8 @@ namespace VehicleReSell.API.Migrations
                     b.Navigation("Staff");
 
                     b.Navigation("Transaction");
+
+                    b.Navigation("VehicleOwner");
                 });
 
             modelBuilder.Entity("VehicleReSell.Data.Model.SaleOrder", b =>
@@ -1048,6 +1103,16 @@ namespace VehicleReSell.API.Migrations
                     b.Navigation("WareHouse");
                 });
 
+            modelBuilder.Entity("VehicleReSell.Data.Model.VehicleImg", b =>
+                {
+                    b.HasOne("VehicleReSell.Data.Model.Vehicle", "Vehicle")
+                        .WithMany("VehicleImgs")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("VehicleReSell.Data.Model.Assessor", b =>
                 {
                     b.Navigation("ItemReceipts");
@@ -1071,6 +1136,11 @@ namespace VehicleReSell.API.Migrations
             modelBuilder.Entity("VehicleReSell.Data.Model.Transaction", b =>
                 {
                     b.Navigation("TransactionLines");
+                });
+
+            modelBuilder.Entity("VehicleReSell.Data.Model.Vehicle", b =>
+                {
+                    b.Navigation("VehicleImgs");
                 });
 
             modelBuilder.Entity("VehicleReSell.Data.Model.WareHouse", b =>

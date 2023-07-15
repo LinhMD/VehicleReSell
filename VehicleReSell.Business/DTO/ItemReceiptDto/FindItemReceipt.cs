@@ -1,4 +1,6 @@
 using CrudApiTemplate.Attributes.Search;
+using CrudApiTemplate.CustomBinding;
+using CrudApiTemplate.Model;
 using CrudApiTemplate.Request;
 using VehicleReSell.Data.Model;
 
@@ -12,7 +14,15 @@ public class FindItemReceipt : IFindRequest<ItemReceipt>
     
     public int? TransactionId { get; set; }
     
+    // [FromClaim("StaffId")]
+    // [Equal("StaffId")]
+    // public int? StaffIdHidden { get; set; }
+    
     public int? StaffId { get; set; }
+    
+    [FromClaim("AssessorId")]
+    [Equal("AssessorId")]
+    public int? AssessorIdHidden { get; set; }
     
     public int? AssessorId { get; set; }
 
@@ -20,5 +30,13 @@ public class FindItemReceipt : IFindRequest<ItemReceipt>
     
     public int? ApproverId { get; set; }
     
-   
+    public ModelStatus? Status { get; set; }
+
+    public int? CreateById { get; set; }
+
+
+    public int? UpdateById { get; set; }
+
+
+    public int? DeleteById { get; set; }
 }

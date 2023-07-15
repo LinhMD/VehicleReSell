@@ -1,4 +1,5 @@
 using CrudApiTemplate.Attributes.Search;
+using CrudApiTemplate.Model;
 using CrudApiTemplate.Request;
 using VehicleReSell.Data.Model;
 
@@ -8,13 +9,28 @@ public class FindEntity : IFindRequest<Entity>
 {
     [Equal]
     public int? Id { get; set; }
+    
     [In(nameof(Entity.Id))]
     public IList<int>? Ids { get; set; }
-    public string? Name { get; set; } = string.Empty;
+    
+    [Contain]
+    public string? Name { get; set; } 
 
-    public string? Phone { get; set; } = string.Empty;
+    [Contain]
+    public string? Phone { get; set; }
 
-    public string? Address { get; set; } = string.Empty;
+    [Contain]
+    public string? Address { get; set; }
 
     public EntityType? EntityType { get; set; }
+    
+    public ModelStatus? Status { get; set; }
+
+    public int? CreateById { get; set; }
+
+
+    public int? UpdateById { get; set; }
+
+
+    public int? DeleteById { get; set; }
 }

@@ -1,12 +1,12 @@
 using CrudApiTemplate.Repository;
-using Microsoft.EntityFrameworkCore;
-using VehicleReSell.Data.Repository;
 
-public class VRSUnitOfWork : UnitOfWork
+namespace VehicleReSell.Data.Repository;
+
+public class VrsUnitOfWork : UnitOfWork
 {
     private readonly VehicleReSellDbContext dataContext;
 
-    public VRSUnitOfWork(VehicleReSellDbContext dataContext) : base(dataContext)
+    public VrsUnitOfWork(VehicleReSellDbContext dataContext) : base(dataContext)
     {
         this.dataContext = dataContext;
     }

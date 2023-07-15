@@ -14,7 +14,7 @@ using VehicleReSell.Data.Model;
 namespace VehicleReSell.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]s")]
 public class SellerController : ControllerBase
 {
     private readonly IServiceCrud<Seller> _sellerService;

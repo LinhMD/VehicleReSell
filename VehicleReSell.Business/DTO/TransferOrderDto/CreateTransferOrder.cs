@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using CrudApiTemplate.CustomBinding;
 using CrudApiTemplate.Model;
 using CrudApiTemplate.Repository;
 using CrudApiTemplate.Request;
@@ -10,34 +11,31 @@ namespace VehicleReSell.Business.DTO.TransferOrderDto;
 
 public class CreateTransferOrder : CreateDto, ICreateRequest<TransferOrder>
 {
-    [Required]
-    public int StaffId { get; set; }
+    [FromClaim("StaffId")]
+    public int? StaffId { get; set; }
     
     [AdaptIgnore]
     public CreateTransaction? Transaction { get; set; }
     public int? TransactionId { get; set; }
 
     public int? FromLocationId { get; set; }
-    public string FromLocationAddress { get; set; } = string.Empty;
+    public string FromLocationAddress { get; set; }  
     public DateTime? LeaveDate { get; set; }
 
-
     public int? ToLocationId { get; set; }
-    public string ToLocationAddress { get; set; } = string.Empty;
+    public string ToLocationAddress { get; set; }  
     public DateTime? ReceiveDate { get; set; }
+    public ApprovalStatus? ApprovalStatus => Data.Model.ApprovalStatus.Open;
     public async Task<TransferOrder> CreateNewAsync(IUnitOfWork work)
     {
         if (Transaction is null) return await Task.FromResult(this.Adapt<TransferOrder>());
         var transaction = await work.Get<Transaction>().AddAsync(Transaction.Adapt<Transaction>());
-            
-        TransactionId = transaction.Id;
-        var transactionLines = Transaction.TransactionLines.Select(line => line.Adapt<TransactionLine>()).Select(async line =>
+        this.TransactionId = transaction.Id;
+        foreach (var transactionLine in Transaction.TransactionLines.Select(line => line.Adapt<TransactionLine>()))
         {
-            line.TransactionId = transaction.Id;
-            await work.Get<TransactionLine>().AddAsync(line);
-            return line;
-        });
-        await Task.WhenAll(transactionLines);
+            transactionLine.TransactionId = transaction.Id;
+            await work.Get<TransactionLine>().AddAsync(transactionLine);
+        }
         return await Task.FromResult(this.Adapt<TransferOrder>());
     }
 }

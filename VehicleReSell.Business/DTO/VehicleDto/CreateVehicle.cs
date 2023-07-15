@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using CrudApiTemplate.Model;
 using CrudApiTemplate.Request;
+using Mapster;
 using VehicleReSell.Data.Model;
 
 namespace VehicleReSell.Business.DTO.VehicleDto;
@@ -8,13 +9,13 @@ namespace VehicleReSell.Business.DTO.VehicleDto;
 public class CreateVehicle : CreateDto, ICreateRequest<Vehicle>
 {
     [Required]
-    public string? Name { get; set; } = string.Empty;
+    public string? Name { get; set; }  
 
     public DateTime? NewAt { get; set; }
 
-    public string? Color { get; set; } = string.Empty;
+    public string? Color { get; set; }  
 
-    public string? Manufacture { get; set; } = string.Empty;
+    public string? Manufacture { get; set; }  
 
     public CarModel? CarModel { get; set; }
 
@@ -26,11 +27,22 @@ public class CreateVehicle : CreateDto, ICreateRequest<Vehicle>
 
     public int? Usage { get; set; }
 
-    public string? Description { get; set; } = string.Empty;
+    public string? Description { get; set; }  
 
-    public string? Imgs { get; set; } = string.Empty;
+    public string? Imgs { get; set; }  
 
-    public string? Videos { get; set; } = string.Empty;
+    public string? Videos { get; set; }  
 
     public int? Capacity { get; set; }
+    
+    public int? ManufactureYear { get; set; }
+    
+    public GearType GearType { get; set; }
+    
+    public FuelType FuelType { get; set; }
+
+    [AdaptIgnore]
+    public IList<string> VehicleImgs { get; set; }
+
+    public VehicleStatus VehicleStatus  => VehicleStatus.Draft;
 }

@@ -1,7 +1,7 @@
 using CrudApiTemplate.Model;
 
 namespace VehicleReSell.Data.Model;
-public class TransferOrder : BaseModel
+public class TransferOrder : BaseModel, IOrderAble
 {
     public int Id { get; set; }
 
@@ -12,12 +12,16 @@ public class TransferOrder : BaseModel
 
     public WareHouse? FromLocation { get; set; }
     public int? FromLocationId { get; set; }
-    public string FromLocationAddress { get; set; } = string.Empty;
+    public string FromLocationAddress { get; set; }  
     public DateTime? LeaveDate { get; set; }
 
     public WareHouse? ToLocation { get; set; }
     public int? ToLocationId { get; set; }
-    public string ToLocationAddress { get; set; } = string.Empty;
+    public string ToLocationAddress { get; set; }  
     public DateTime? ReceiveDate { get; set; }
-
+    public ApprovalStatus ApprovalStatus { get; set; }
+    public void ConfigOrderBy()
+    {
+        SetUpOrderBy<TransferOrder>();
+    }
 }

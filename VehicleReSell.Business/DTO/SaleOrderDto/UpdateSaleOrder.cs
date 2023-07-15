@@ -17,4 +17,6 @@ public class UpdateSaleOrder : UpdateDto, IUpdateRequest<SaleOrder>
     public int? SellerId { get; set; }
 
     public int? CustomerId { get; set; }
+    public ApprovalStatus? ApprovalStatus { get; set; }
+    public string? Note { get; set; }
 }

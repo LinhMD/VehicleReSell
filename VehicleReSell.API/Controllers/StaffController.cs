@@ -14,13 +14,13 @@ using VehicleReSell.Data.Model;
 namespace VehicleReSell.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]s")]
 public class StaffController : ControllerBase
 {    
     private readonly IServiceCrud<Staff> _staffService;
     private readonly IRepository<Staff> _repo;
 
-    public StaffController(IUnitOfWork work, ILogger logger)
+    public StaffController(IUnitOfWork work, ILogger<StaffController> logger)
     {
         _staffService = new ServiceCrud<Staff>(work, logger);
         _repo = work.Get<Staff>();

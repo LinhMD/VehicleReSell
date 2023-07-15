@@ -8,7 +8,7 @@ namespace VehicleReSell.Business.DTO.TransactionDto;
 public class UpdateTransaction : UpdateDto, IUpdateRequest<Transaction>
 {
     public int Id { get; set; }
-    public string TransactionName { get; set; } = string.Empty;
+    public string TransactionName { get; set; }  
 
     public long TotalAmount { get; set; } = 0;
 
@@ -20,5 +20,5 @@ public class UpdateTransaction : UpdateDto, IUpdateRequest<Transaction>
 
     public TransactionStatus TransactionStatus { get; set; } = TransactionStatus.Open;
 
-    public IList<UpdateLine> TransactionLines { get; set; } = new List<UpdateLine>();
+    // public IList<UpdateLine> TransactionLines { get; set; } = new List<UpdateLine>();
 }

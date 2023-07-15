@@ -2,7 +2,7 @@ using CrudApiTemplate.Model;
 
 namespace VehicleReSell.Data.Model;
 
-public class CustomerEvent : BaseModel
+public class CustomerEvent : BaseModel, IOrderAble
 {
     public int Id { get; set; }
 
@@ -15,10 +15,13 @@ public class CustomerEvent : BaseModel
     public int? VehicleId { get; set; }
     public Vehicle? Vehicle { get; set; }
 
-    public string? Note { get; set; } = string.Empty;
+    public string? Note { get; set; }  
 
     public DateTime? Date { get; set; }
 
 
-
+    public void ConfigOrderBy()
+    {
+        SetUpOrderBy<CustomerEvent>();
+    }
 }

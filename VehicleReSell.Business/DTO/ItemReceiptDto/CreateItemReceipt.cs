@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using CrudApiTemplate.CustomBinding;
 using CrudApiTemplate.Model;
 using CrudApiTemplate.Repository;
 using CrudApiTemplate.Request;
@@ -14,27 +15,36 @@ public class CreateItemReceipt : CreateDto, ICreateRequest<ItemReceipt>
     [AdaptIgnore]
     public CreateTransaction? Transaction { get; set; }
 
+    [FromClaim("StaffId")]
     public int? StaffId { get; set; }
 
     public int? AssessorId { get; set; }
+    
+    
+    public int? VehicleOwnerId { get; set; }
 
     public ItemReceiptStatus ItemReceiptStatus { get; set; }
 
     public int? Approver { get; set; }
+    public string? Request { get; set; }
+
+    public string? Img { get; set; }
 
     public async Task<ItemReceipt> CreateNewAsync(IUnitOfWork work)
     {
         if (Transaction is null) return await Task.FromResult(this.Adapt<ItemReceipt>());
         var transaction = await work.Get<Transaction>().AddAsync(Transaction.Adapt<Transaction>());
-            
-        TransactionId = transaction.Id;
-        var transactionLines = Transaction.TransactionLines.Select(line => line.Adapt<TransactionLine>()).Select(async line =>
+        this.TransactionId = transaction.Id;
+        foreach (var transactionLine in Transaction.TransactionLines.Select(line => line.Adapt<TransactionLine>()))
         {
-            line.TransactionId = transaction.Id;
-            await work.Get<TransactionLine>().AddAsync(line);
-            return line;
-        });
-        await Task.WhenAll(transactionLines);
+            transactionLine.TransactionId = transaction.Id;
+            await work.Get<TransactionLine>().AddAsync(transactionLine);
+        }
         return await Task.FromResult(this.Adapt<ItemReceipt>());
+    }
+
+    public override void InitMapper()
+    {
+        TypeAdapterConfig<CreateItemReceipt, ItemReceipt>.NewConfig().Ignore(receipt => receipt.Approver);
     }
 }

@@ -1,4 +1,5 @@
 using CrudApiTemplate.Attributes.Search;
+using CrudApiTemplate.Model;
 using CrudApiTemplate.Request;
 using VehicleReSell.Data.Model;
 
@@ -17,7 +18,17 @@ public class FindCustomerEvent : IFindRequest<CustomerEvent>
 
     public int? VehicleId { get; set; }
 
-    public string? Note { get; set; } = string.Empty;
+    public string? Note { get; set; }  
 
     public DateTime? Date { get; set; }
+    
+    public ModelStatus? Status { get; set; }
+
+    public int? CreateById { get; set; }
+
+
+    public int? UpdateById { get; set; }
+
+
+    public int? DeleteById { get; set; }
 }

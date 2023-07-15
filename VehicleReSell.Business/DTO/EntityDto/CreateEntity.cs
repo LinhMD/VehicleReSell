@@ -8,12 +8,12 @@ namespace VehicleReSell.Business.DTO.EntityDto;
 public class CreateEntity : CreateDto, ICreateRequest<Entity>
 {
     [Required]
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; }  
 
     [Phone]
     [Required]
     public string Phone { get; set; }
     
-    public string? Address { get; set; } 
+    public string Address { get; set; } 
 
 }

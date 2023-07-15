@@ -1,8 +1,9 @@
+using System.Text.Json.Serialization;
 using CrudApiTemplate.Model;
 
 namespace VehicleReSell.Data.Model;
 
-public class Vehicle : BaseModel
+public class Vehicle : BaseModel, IOrderAble
 {
     public int Id { get; set; }
 
@@ -17,6 +18,7 @@ public class Vehicle : BaseModel
     public CarModel CarModel { get; set; }
 
     public long? AssessPrice { get; set; }
+    
     public long? SoldPrice { get; set; }
 
     public int? AssessorId { get; set; }
@@ -37,5 +39,39 @@ public class Vehicle : BaseModel
     public string? Videos { get; set; }
 
     public int? Capacity { get; set; }
+    
+    public int? ManufactureYear { get; set; }
+    public GearType GearType { get; set; }
+    public FuelType FuelType { get; set; }
+    public VehicleStatus VehicleStatus { get; set; } 
+    
+    public IList<VehicleImg> VehicleImgs { get; set; }
+    public void ConfigOrderBy()
+    {
+        SetUpOrderBy<Vehicle>();
+    }
+}
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum GearType
+{
+    Automatic,
+    Manual
+}
+    
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum FuelType
+{
+    Electric,
+    Gas,
+    Hybrid
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum VehicleStatus
+{
+    Draft,
+    Inventory,
+    Order,
+    Sold
 }

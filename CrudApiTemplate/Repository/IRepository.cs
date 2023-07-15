@@ -38,4 +38,6 @@ public interface IRepository<TModel> where TModel : class
     public Task CommitAsync();
 
     public IQueryable<TModel> IncludeAll();
+    public Task<TModel> UpdateFieldAsync(Expression<Func<TModel, dynamic>> fieldExpression, TModel model);
+
 }

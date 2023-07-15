@@ -10,7 +10,6 @@ public abstract class FilterAttribute : Attribute
     {
         Target = target;
         PropertyName = propertyName;
-
     }
 
     protected FilterAttribute()

@@ -1,8 +1,9 @@
+using System.Text.Json.Serialization;
 using CrudApiTemplate.Model;
 
 namespace VehicleReSell.Data.Model;
 
-public class WareHouse : BaseModel
+public class WareHouse : BaseModel, IOrderAble
 {
     public int Id { get; set; }
 
@@ -16,5 +17,18 @@ public class WareHouse : BaseModel
 
     public int? MaxCapacity { get; set; }
 
-    public int? CurrentCapacity { get; set; }
+    public Capacity Capacity { get; set; }
+
+    public int AvailableCapacity { get; set; }
+    public void ConfigOrderBy()
+    {
+        SetUpOrderBy<WareHouse>();
+    }
+}
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum Capacity
+{
+    Low,
+    Medium,
+    High
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using CrudApiTemplate.CustomBinding;
 using CrudApiTemplate.Model;
 using CrudApiTemplate.Request;
 using VehicleReSell.Business.DTO.EntityDto;

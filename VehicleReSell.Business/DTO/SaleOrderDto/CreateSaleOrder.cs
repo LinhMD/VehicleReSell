@@ -1,3 +1,4 @@
+using CrudApiTemplate.CustomBinding;
 using CrudApiTemplate.Model;
 using CrudApiTemplate.Repository;
 using CrudApiTemplate.Request;
@@ -13,27 +14,23 @@ public class CreateSaleOrder : CreateDto, ICreateRequest<SaleOrder>
     [AdaptIgnore]
     public CreateTransaction? Transaction { get; set; }
 
-    public int? StaffId { get; set; }
+    [FromClaim("SellerId")]
+    public int? SellerId { get; set; }
 
-    public int? AssessorId { get; set; }
-
-    public ItemReceiptStatus ItemReceiptStatus { get; set; }
-
-    public int? Approver { get; set; }
-
-    public async Task<ItemReceipt> CreateNewAsync(IUnitOfWork work)
+    public int? CustomerId { get; set; }
+    public ApprovalStatus ApprovalStatus { get; set; } = ApprovalStatus.Open;
+    public string? Note { get; set; }
+    async Task<SaleOrder> ICreateRequest<SaleOrder>.CreateNewAsync(IUnitOfWork work)
     {
-        if (Transaction is null) return await Task.FromResult(this.Adapt<ItemReceipt>());
+        if (Transaction is null) return await Task.FromResult(this.Adapt<SaleOrder>());
         var transaction = await work.Get<Transaction>().AddAsync(Transaction.Adapt<Transaction>());
-            
-        TransactionId = transaction.Id;
-        var transactionLines = Transaction.TransactionLines.Select(line => line.Adapt<TransactionLine>()).Select(async line =>
+        this.TransactionId = transaction.Id;
+        foreach (var transactionLine in Transaction.TransactionLines.Select(line => line.Adapt<TransactionLine>()))
         {
-            line.TransactionId = transaction.Id;
-            await work.Get<TransactionLine>().AddAsync(line);
-            return line;
-        });
-        await Task.WhenAll(transactionLines);
-        return await Task.FromResult(this.Adapt<ItemReceipt>());
+            transactionLine.TransactionId = transaction.Id;
+            await work.Get<TransactionLine>().AddAsync(transactionLine);
+        }
+        return await Task.FromResult(this.Adapt<SaleOrder>());
     }
+
 }

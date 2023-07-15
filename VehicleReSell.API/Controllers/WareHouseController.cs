@@ -14,33 +14,33 @@ using VehicleReSell.Data.Model;
 namespace VehicleReSell.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]s")]
 public class WareHouseController : ControllerBase
 {    
     private readonly IServiceCrud<WareHouse> _wareHouseService;
     private readonly IRepository<WareHouse> _repo;
 
-    public WareHouseController(IUnitOfWork work, ILogger logger)
+    public WareHouseController(IUnitOfWork work, ILogger<WareHouseController> logger)
     {
         _wareHouseService = new ServiceCrud<WareHouse>(work, logger);
         _repo = work.Get<WareHouse>();
     }
 
     [HttpGet("{id:int}")]
-    [SwaggerResponse(200,"WareHouse view", typeof(WareHouseSView))]
-    public async Task<ActionResult<WareHouseSView>> Get(int id)
+    [SwaggerResponse(200,"WareHouse view", typeof(WareHouseView))]
+    public async Task<ActionResult<WareHouseView>> Get(int id)
     {
-        return Ok(await _repo.Find<WareHouseSView>(wareHouse => wareHouse.Id == id).FirstOrDefaultAsync() ??
+        return Ok(await _repo.Find<WareHouseView>(wareHouse => wareHouse.Id == id).FirstOrDefaultAsync() ??
                   throw new ModelNotFoundException($"Not Found {nameof(WareHouse)} with id {id}"));
     }
     [HttpGet]
-    [SwaggerResponse(200,"WareHouse view page", typeof(PagingResponse<WareHouseSView>))]
-    public async Task<ActionResult<PagingResponse<WareHouseSView>>> Get(
+    [SwaggerResponse(200,"WareHouse view page", typeof(PagingResponse<WareHouseView>))]
+    public async Task<ActionResult<PagingResponse<WareHouseView>>> Get(
         [FromQuery] FindWareHouse request,
         [FromQuery] PagingRequest paging,
         [FromQuery] string? orderBy)
     {
-        var (WareHouseViews, total) = await _wareHouseService.GetAsync<WareHouseSView>(new GetRequest<WareHouse>
+        var (WareHouseViews, total) = await _wareHouseService.GetAsync<WareHouseView>(new GetRequest<WareHouse>
         {
             FindRequest = request,
             OrderRequest = orderBy.ToOrderRequest<WareHouse>(),

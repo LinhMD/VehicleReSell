@@ -1,6 +1,4 @@
-﻿
-
-namespace CrudApiTemplate.Model;
+﻿namespace CrudApiTemplate.Model;
 
 public class CreateDto : IDto
 {

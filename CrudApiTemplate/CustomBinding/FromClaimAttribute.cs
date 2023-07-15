@@ -7,9 +7,9 @@ public class FromClaimAttribute : Attribute, IBindingSourceMetadata, IModelNameP
 {
     public BindingSource BindingSource => ClaimValueProviderFactory.Claim;
 
-    public FromClaimAttribute(string type)
+    public FromClaimAttribute(string fieldName)
     {
-        Name = type;
+        Name = fieldName;
     }
 
     public string Name { get; }

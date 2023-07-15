@@ -8,8 +8,9 @@ public class UpdateDto : IDto
     public DateTime UpdateAt { get; } = DateTime.Now;
 
     [FromClaim("UserId")]
-    public int UpdateBy { get; set; }
+    public int? UpdateBy { get; set; }
 
+    public ModelStatus? Status { get; set; }
     public virtual void InitMapper()
     {
     }

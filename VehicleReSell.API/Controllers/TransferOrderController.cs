@@ -9,19 +9,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using VehicleReSell.Business.DTO.TransferOrderDto;
+using VehicleReSell.Business.Service.Core;
 using VehicleReSell.Data.Model;
 
 namespace VehicleReSell.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]s")]
 public class TransferOrderController : ControllerBase
 {
     private readonly IServiceCrud<TransferOrder> _transferOrderService;
     private readonly IRepository<TransferOrder> _repo;
+    private readonly ITransactionService _transactionService;
+    private readonly IUnitOfWork _work;
 
-    public TransferOrderController(IUnitOfWork work, ILogger<TransferOrderController> logger)
+    public TransferOrderController(IUnitOfWork work, ILogger<TransferOrderController> logger, ITransactionService transactionService)
     {
+        _work = work;
+        _transactionService = transactionService;
         _transferOrderService = new ServiceCrud<TransferOrder>(work, logger);
         _repo = work.Get<TransferOrder>();
     }
@@ -60,13 +65,35 @@ public class TransferOrderController : ControllerBase
     [SwaggerResponse(200,"Update TransferOrder", typeof(TransferOrder))]
     public async Task<ActionResult<TransferOrder>> Update([FromBody] UpdateTransferOrder request, int id)
     {
+        if (request.ApprovalStatus == ApprovalStatus.Approved)
+        {
+            var transferOrder = await _work.Get<TransferOrder>().GetAsync(id);
+            if (transferOrder?.TransactionId != null)
+            {
+                await _transactionService.UpdateVehicleStatusAsync(transferOrder.TransactionId.Value, 
+                    VehicleStatus.Order,
+                    VehicleStatus.Sold);
+                await _work.Get<Transaction>().UpdateFieldAsync(t => t.TransactionStatus, new Transaction()
+                {
+                    Id = transferOrder.TransactionId.Value,
+                    TransactionStatus = TransactionStatus.Success
+                });
+            }
+        }
         return Ok(await _transferOrderService.UpdateAsync(id, request));
     }
     [HttpDelete("{id:int}")]
     [SwaggerResponse(200,"Soft Delete TransferOrder", typeof(TransferOrder))]
     public async Task<ActionResult<TransferOrder>> Delete(int id)
     {
-        return Ok(await _transferOrderService.UpdateAsync(id, new SoftDeleteDto<TransferOrder>()));
+        var transferOrder = await _transferOrderService.UpdateAsync(id, new SoftDeleteDto<TransferOrder>());
+        if (transferOrder.TransactionId != null)
+            await _work.Get<Transaction>().UpdateFieldAsync(t => t.TransactionStatus, new Transaction()
+            {
+                Id = transferOrder.TransactionId.Value,
+                TransactionStatus = TransactionStatus.Success
+            });
+        return Ok(transferOrder);
     }
 
 }

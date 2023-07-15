@@ -1,23 +1,27 @@
-using CrudApiTemplate.Model;
-using CrudApiTemplate.View;
-using VehicleReSell.Business.DTO.VehicleDto;
+﻿using Mapster;
 using VehicleReSell.Data.Model;
 
 namespace VehicleReSell.Business.DTO.WareHouseDto;
 
-public class WareHouseSView :  IView<WareHouse>, IDto
+public class WareHouseSView
 {
     public int Id { get; set; }
 
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; } 
 
-    public string Phone { get; set; } = string.Empty;
+    public string Phone { get; set; }
 
-    public string Address { get; set; } = string.Empty;
-
-    public IList<VehicleSView> Vehicles { get; set; } = new List<VehicleSView>();
+    public string Address { get; set; }
 
     public int MaxCapacity { get; set; }
 
-    public int CurrentCapacity { get; set; }
+    public Capacity Capacity { get; set; }
+    
+    public int AvailableCapacity { get; set; }
+    
+    public void InitMapper()
+    {
+        TypeAdapterConfig<WareHouse, WareHouseSView>.NewConfig();
+    }
+
 }

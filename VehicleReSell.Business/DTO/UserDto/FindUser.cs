@@ -1,4 +1,5 @@
 using CrudApiTemplate.Attributes.Search;
+using CrudApiTemplate.Model;
 using CrudApiTemplate.Request;
 using VehicleReSell.Data.Model;
 
@@ -13,8 +14,18 @@ public class FindUser : IFindRequest<User>
     public IList<int>? Ids { get; set; }
 
     [Contain]
-    public string? UserName { get; set; } = string.Empty;
-
+    public string? UserName { get; set; }  
+ 
     [Equal]
     public Role? Role { get; set; }
+    
+    public ModelStatus? Status { get; set; }
+
+    public int? CreateById { get; set; }
+
+
+    public int? UpdateById { get; set; }
+
+
+    public int? DeleteById { get; set; }
 }

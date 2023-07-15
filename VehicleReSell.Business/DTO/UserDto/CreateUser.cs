@@ -7,9 +7,13 @@ namespace VehicleReSell.Business.DTO.UserDto;
 
 public class CreateUser : CreateDto, ICreateRequest<User>
 {
+    
     [Required]
-    public string UserName { get; set; } = string.Empty;
-
+    public string UserName { get; set; }  
+    [Required]
+    public string Email { get; set; }
     [Required]
     public Role Role { get; set; }
+
+    public string? AvatarLink { get; set; }
 }

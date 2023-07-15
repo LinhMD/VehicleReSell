@@ -9,18 +9,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using VehicleReSell.Business.DTO.SaleOrderDto;
+using VehicleReSell.Business.Service.Core;
 using VehicleReSell.Data.Model;
 
 namespace VehicleReSell.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]s")]
 public class SaleOrderController : ControllerBase
 {    private readonly IServiceCrud<SaleOrder> _saleOrderService;
     private readonly IRepository<SaleOrder> _repo;
+    private readonly ITransactionService _transactionService;
+    private readonly IUnitOfWork _work;
 
-    public SaleOrderController(IUnitOfWork work, ILogger logger)
+    public SaleOrderController(IUnitOfWork work, ILogger<SaleOrderController> logger, ITransactionService transactionService)
     {
+        _work = work;
+        _transactionService = transactionService;
         _saleOrderService = new ServiceCrud<SaleOrder>(work, logger);
         _repo = work.Get<SaleOrder>();
     }
@@ -53,19 +58,48 @@ public class SaleOrderController : ControllerBase
     [SwaggerResponse(200,"SaleOrder", typeof(SaleOrder))]
     public async Task<ActionResult<SaleOrder>> Create([FromBody] CreateSaleOrder request)
     {
-        return Ok(await _saleOrderService.CreateAsync(request));
+        var saleOrder = await _saleOrderService.CreateAsync(request);
+        if (saleOrder.TransactionId != null)
+        {
+            await _transactionService.UpdateVehicleStatusAsync(saleOrder.TransactionId.Value, 
+                VehicleStatus.Inventory,
+                VehicleStatus.Order);
+        }
+        return Ok(saleOrder);
     }
     [HttpPut("{id:int}")] 
     [SwaggerResponse(200,"SaleOrder", typeof(SaleOrder))]
     public async Task<ActionResult<SaleOrder>> Update([FromBody] UpdateSaleOrder request, int id)
     {
+        if (request.ApprovalStatus == ApprovalStatus.Approved)
+        {
+            var saleOrder = await _work.Get<SaleOrder>().GetAsync(id);
+            if (saleOrder?.TransactionId != null)
+            {
+                await _transactionService.UpdateVehicleStatusAsync(saleOrder.TransactionId.Value, 
+                    VehicleStatus.Order,
+                    VehicleStatus.Sold);
+                await _work.Get<Transaction>().UpdateFieldAsync(t => t.TransactionStatus, new Transaction()
+                {
+                    Id = saleOrder.TransactionId.Value,
+                    TransactionStatus = TransactionStatus.Success
+                });
+            }
+        }
         return Ok(await _saleOrderService.UpdateAsync(id, request));
     }
     [HttpDelete("{id:int}")]
     [SwaggerResponse(200,"SaleOrder", typeof(SaleOrder))]
     public async Task<ActionResult<SaleOrder>> Delete(int id)
     {
-        return Ok(await _saleOrderService.UpdateAsync(id, new SoftDeleteDto<SaleOrder>()));
+        var saleOrder = await _saleOrderService.UpdateAsync(id, new SoftDeleteDto<SaleOrder>());
+        if (saleOrder.TransactionId != null)
+            await _work.Get<Transaction>().UpdateFieldAsync(t => t.TransactionStatus, new Transaction()
+            {
+                Id = saleOrder.TransactionId.Value,
+                TransactionStatus = TransactionStatus.Failed
+            });
+        return Ok(saleOrder);
     }
 
 }

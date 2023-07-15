@@ -10,17 +10,14 @@ namespace VehicleReSell.Business.DTO.TransactionDto;
 public class CreateTransaction : CreateDto, ICreateRequest<Transaction>
 {
     [Required]
-    public string TransactionName { get; set; } = string.Empty;
+    public string TransactionName { get; set; }  
 
-    public long TotalAmount { get; set; } = 0;
+    public long TotalAmount { get; set; }
 
     public DateTime TransactionDate { get; set; } = DateTime.Now;
 
     [Required]
     public TransactionType TransactionType { get; set; }
-
-    [Required]
-    public ApprovalStatus ApprovalStatus { get;  } = ApprovalStatus.Open;
 
     [Required]
     public TransactionStatus TransactionStatus { get;  } = TransactionStatus.Open;

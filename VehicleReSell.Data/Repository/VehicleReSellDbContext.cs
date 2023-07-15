@@ -1,3 +1,4 @@
+using CrudApiTemplate.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using VehicleReSell.Data.Model;
@@ -29,7 +30,7 @@ namespace VehicleReSell.Data.Repository
             {
                 foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
             }
-
+          
         }
 
         public DbSet<User> Users { get; set; }
