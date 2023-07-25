@@ -1,3 +1,4 @@
+using CrudApiTemplate.CustomBinding;
 using CrudApiTemplate.CustomException;
 using CrudApiTemplate.Model;
 using CrudApiTemplate.Repository;
@@ -17,7 +18,8 @@ namespace VehicleReSell.API.Controllers;
 [ApiController]
 [Route("api/[controller]s")]
 public class SaleOrderController : ControllerBase
-{    private readonly IServiceCrud<SaleOrder> _saleOrderService;
+{
+    private readonly IServiceCrud<SaleOrder> _saleOrderService;
     private readonly IRepository<SaleOrder> _repo;
     private readonly ITransactionService _transactionService;
     private readonly IUnitOfWork _work;
@@ -31,14 +33,14 @@ public class SaleOrderController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [SwaggerResponse(200,"SaleOrder view", typeof(SaleOrderSView))]
+    [SwaggerResponse(200, "SaleOrder view", typeof(SaleOrderSView))]
     public async Task<ActionResult<SaleOrderSView>> Get(int id)
     {
         return Ok(await _repo.Find<SaleOrderSView>(saleOrder => saleOrder.Id == id).FirstOrDefaultAsync() ??
                   throw new ModelNotFoundException($"Not Found {nameof(SaleOrder)} with id {id}"));
     }
     [HttpGet]
-    [SwaggerResponse(200,"SaleOrder view page", typeof(PagingResponse<SaleOrderSView>))]
+    [SwaggerResponse(200, "SaleOrder view page", typeof(PagingResponse<SaleOrderSView>))]
     public async Task<ActionResult<PagingResponse<SaleOrderSView>>> Get(
         [FromQuery] FindSaleOrder request,
         [FromQuery] PagingRequest paging,
@@ -51,24 +53,25 @@ public class SaleOrderController : ControllerBase
             PagingRequest = paging
         });
 
-        return Ok(( saleOrderViews, total).ToPagingResponse(paging));
+        return Ok((saleOrderViews, total).ToPagingResponse(paging));
     }
 
     [HttpPost]
-    [SwaggerResponse(200,"SaleOrder", typeof(SaleOrder))]
-    public async Task<ActionResult<SaleOrder>> Create([FromBody] CreateSaleOrder request)
+    [SwaggerResponse(200, "SaleOrder", typeof(SaleOrder))]
+    public async Task<ActionResult<SaleOrder>> Create([FromBody] CreateSaleOrder request, [FromClaim("SellerId")] int? sellerId)
     {
+        request.SellerId = sellerId;
         var saleOrder = await _saleOrderService.CreateAsync(request);
         if (saleOrder.TransactionId != null)
         {
-            await _transactionService.UpdateVehicleStatusAsync(saleOrder.TransactionId.Value, 
+            await _transactionService.UpdateVehicleStatusAsync(saleOrder.TransactionId.Value,
                 VehicleStatus.Inventory,
                 VehicleStatus.Order);
         }
         return Ok(saleOrder);
     }
-    [HttpPut("{id:int}")] 
-    [SwaggerResponse(200,"SaleOrder", typeof(SaleOrder))]
+    [HttpPut("{id:int}")]
+    [SwaggerResponse(200, "SaleOrder", typeof(SaleOrder))]
     public async Task<ActionResult<SaleOrder>> Update([FromBody] UpdateSaleOrder request, int id)
     {
         if (request.ApprovalStatus == ApprovalStatus.Approved)
@@ -76,7 +79,7 @@ public class SaleOrderController : ControllerBase
             var saleOrder = await _work.Get<SaleOrder>().GetAsync(id);
             if (saleOrder?.TransactionId != null)
             {
-                await _transactionService.UpdateVehicleStatusAsync(saleOrder.TransactionId.Value, 
+                await _transactionService.UpdateVehicleStatusAsync(saleOrder.TransactionId.Value,
                     VehicleStatus.Order,
                     VehicleStatus.Sold);
                 await _work.Get<Transaction>().UpdateFieldAsync(t => t.TransactionStatus, new Transaction()
@@ -86,10 +89,16 @@ public class SaleOrderController : ControllerBase
                 });
             }
         }
-        return Ok(await _saleOrderService.UpdateAsync(id, request));
+        var updated = await _saleOrderService.UpdateAsync(id, request);
+        if (request.Transaction != null)
+        {
+            var transaction = await _transactionService.UpdateTransactionAsync(request.Transaction);
+        }
+
+        return Ok(updated);
     }
     [HttpDelete("{id:int}")]
-    [SwaggerResponse(200,"SaleOrder", typeof(SaleOrder))]
+    [SwaggerResponse(200, "SaleOrder", typeof(SaleOrder))]
     public async Task<ActionResult<SaleOrder>> Delete(int id)
     {
         var saleOrder = await _saleOrderService.UpdateAsync(id, new SoftDeleteDto<SaleOrder>());

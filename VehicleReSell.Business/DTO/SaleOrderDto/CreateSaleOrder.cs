@@ -18,6 +18,9 @@ public class CreateSaleOrder : CreateDto, ICreateRequest<SaleOrder>
     public int? SellerId { get; set; }
 
     public int? CustomerId { get; set; }
+
+    public int? ApproverId { get; set; }
+
     public ApprovalStatus ApprovalStatus { get; set; } = ApprovalStatus.Open;
     public string? Note { get; set; }
     async Task<SaleOrder> ICreateRequest<SaleOrder>.CreateNewAsync(IUnitOfWork work)

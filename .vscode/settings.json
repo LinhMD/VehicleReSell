@@ -1,3 +1,5 @@
 {
-    "dotnet.defaultSolution": "VehicleReSell.sln"
+    "dotnet.defaultSolution": "VehicleReSell.sln",
+    "appService.defaultWebAppToDeploy": "/subscriptions/18c6847f-a6db-42f1-be54-f9e746b8dbfb/resourceGroups/DefaultResourceGroup-SE/providers/Microsoft.Web/sites/webapp-230621221913",
+    "appService.deploySubpath": "VehicleReSell.API\\bin\\Publish"
 }

@@ -9,7 +9,6 @@ namespace VehicleReSell.Business.DTO.SaleOrderDto;
 
 public class UpdateSaleOrder : UpdateDto, IUpdateRequest<SaleOrder>
 {
-    public int Id { get; set; }
 
     [AdaptIgnore]
     public UpdateTransaction? Transaction { get; set; }
@@ -19,4 +18,8 @@ public class UpdateSaleOrder : UpdateDto, IUpdateRequest<SaleOrder>
     public int? CustomerId { get; set; }
     public ApprovalStatus? ApprovalStatus { get; set; }
     public string? Note { get; set; }
+
+    public int? ApproverId { get; set; }
+
+
 }

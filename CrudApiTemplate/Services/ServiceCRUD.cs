@@ -18,6 +18,10 @@ public class ServiceCrud<TModel> : IServiceCrud<TModel> where TModel : class
     protected readonly IUnitOfWork UnitOfWork;
 
     protected readonly ILogger Logger;
+    private static JsonSerializerOptions SeriOptions = new JsonSerializerOptions
+    {
+        MaxDepth = 1
+    };
 
     public ServiceCrud(IUnitOfWork work, ILogger logger)
     {
@@ -33,13 +37,13 @@ public class ServiceCrud<TModel> : IServiceCrud<TModel> where TModel : class
         try
         {
             model = Repository.Add(model);
-            UnitOfWork.Get<SystemLog>()?.Add(new SystemLog()
-            {
-                NewRecord = JsonSerializer.Serialize(model),
-                User = createBy,
-                OldRecord = string.Empty,
-                RecordType = typeof(TModel).Name,
-            });
+            // UnitOfWork.Get<SystemLog>()?.Add(new SystemLog()
+            // {
+            //     NewRecord = JsonSerializer.Serialize(model, SeriOptions),
+            //     User = createBy,
+            //     OldRecord = string.Empty,
+            //     RecordType = typeof(TModel).Name,
+            // });
         }
         catch (Exception ex)
         {
@@ -58,13 +62,13 @@ public class ServiceCrud<TModel> : IServiceCrud<TModel> where TModel : class
         {
             model = await Repository.AddAsync(model);
 
-            await UnitOfWork.Get<SystemLog>()?.AddAsync(new SystemLog()
-            {
-                NewRecord = JsonSerializer.Serialize(model),
-                User = createBy,
-                OldRecord = string.Empty,
-                RecordType = typeof(TModel).Name,
-            })!;
+            // await UnitOfWork.Get<SystemLog>()?.AddAsync(new SystemLog()
+            // {
+            //     NewRecord = JsonSerializer.Serialize(model, SeriOptions),
+            //     User = createBy,
+            //     OldRecord = string.Empty,
+            //     RecordType = typeof(TModel).Name,
+            // })!;
         }
         catch (DbUpdateException e)
         {
@@ -74,11 +78,11 @@ public class ServiceCrud<TModel> : IServiceCrud<TModel> where TModel : class
             if (exceptionMessage.Contains("duplicate"))
             {
                 var dupValue = exceptionMessage.Substring(exceptionMessage.IndexOf('(') + 1,
-                    (exceptionMessage.IndexOf(')') - exceptionMessage.IndexOf('(') - 1));
+                    exceptionMessage.IndexOf(')') - exceptionMessage.IndexOf('(') - 1);
                 throw new DbQueryException($"Duplicate value: {dupValue}", DbError.Create);
             }
             throw new DbQueryException($"Error create {typeof(TModel).Name}  with message: {exceptionMessage}.", DbError.Create);
-            
+
         }
         return model;
     }
@@ -87,19 +91,19 @@ public class ServiceCrud<TModel> : IServiceCrud<TModel> where TModel : class
     {
         var model = Get(id);
 
-        var oldRecord = JsonSerializer.Serialize(model);
+        //var oldRecord = JsonSerializer.Serialize(model);
         updateRequest.UpdateModel(ref model, UnitOfWork);
         model.Validate();
         try
         {
             Repository.Commit();
-            UnitOfWork.Get<SystemLog>()?.Add(new SystemLog()
-            {
-                NewRecord = JsonSerializer.Serialize(model),
-                User = updateBy,
-                OldRecord = oldRecord,
-                RecordType = typeof(TModel).Name,
-            });
+            // UnitOfWork.Get<SystemLog>()?.Add(new SystemLog()
+            // {
+            //     NewRecord = JsonSerializer.Serialize(model, SeriOptions),
+            //     User = updateBy,
+            //     OldRecord = oldRecord,
+            //     RecordType = typeof(TModel).Name,
+            // });
         }
         catch (Exception ex)
         {
@@ -113,19 +117,12 @@ public class ServiceCrud<TModel> : IServiceCrud<TModel> where TModel : class
     public async Task<TModel> UpdateAsync(int id, IUpdateRequest<TModel> updateRequest, int? updateBy = null)
     {
         var model = await GetAsync(id);
-        var oldRcord = JsonSerializer.Serialize(model);
+        // var oldRcord = JsonSerializer.Serialize(model);
         updateRequest.UpdateModel(ref model, UnitOfWork);
         model.Validate();
         try
         {
             await Repository.CommitAsync();
-            UnitOfWork.Get<SystemLog>()?.AddAsync(new SystemLog()
-            {
-                NewRecord = JsonSerializer.Serialize(model),
-                User = updateBy,
-                OldRecord = oldRcord,
-                RecordType = typeof(TModel).Name,
-            });
         }
         catch (Exception ex)
         {
@@ -143,13 +140,13 @@ public class ServiceCrud<TModel> : IServiceCrud<TModel> where TModel : class
         try
         {
             Repository.Remove(model);
-            UnitOfWork.Get<SystemLog>()?.Add(new SystemLog()
-            {
-                NewRecord = string.Empty,
-                User = deleteBy,
-                OldRecord = JsonSerializer.Serialize(model),
-                RecordType = typeof(TModel).Name,
-            });
+            // UnitOfWork.Get<SystemLog>()?.Add(new SystemLog()
+            // {
+            //     NewRecord = string.Empty,
+            //     User = deleteBy,
+            //     OldRecord = JsonSerializer.Serialize(model, SeriOptions),
+            //     RecordType = typeof(TModel).Name,
+            // });
         }
         catch (Exception ex)
         {
@@ -166,13 +163,13 @@ public class ServiceCrud<TModel> : IServiceCrud<TModel> where TModel : class
         try
         {
             await Repository.RemoveAsync(model);
-            UnitOfWork.Get<SystemLog>()?.AddAsync(new SystemLog()
-            {
-                NewRecord = string.Empty,
-                User = deleteBy,
-                OldRecord = JsonSerializer.Serialize(model),
-                RecordType = typeof(TModel).Name,
-            });
+            // UnitOfWork.Get<SystemLog>()?.AddAsync(new SystemLog()
+            // {
+            //     NewRecord = string.Empty,
+            //     User = deleteBy,
+            //     OldRecord = JsonSerializer.Serialize(model, SeriOptions),
+            //     RecordType = typeof(TModel).Name,
+            // });
         }
         catch (Exception ex)
         {

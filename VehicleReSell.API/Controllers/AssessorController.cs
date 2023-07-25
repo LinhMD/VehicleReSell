@@ -1,3 +1,4 @@
+using CrudApiTemplate.CustomBinding;
 using CrudApiTemplate.CustomException;
 using CrudApiTemplate.Model;
 using CrudApiTemplate.Repository;
@@ -15,7 +16,7 @@ namespace VehicleReSell.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]s")]
-public class AssessorController: ControllerBase
+public class AssessorController : ControllerBase
 {
     private readonly IServiceCrud<Assessor> _assessorService;
     private readonly IRepository<Assessor> _repo;
@@ -27,14 +28,14 @@ public class AssessorController: ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [SwaggerResponse(200,"Assessor view", typeof(AssessorSView))]
+    [SwaggerResponse(200, "Assessor view", typeof(AssessorSView))]
     public async Task<ActionResult<AssessorSView>> Get(int id)
     {
         return Ok(await _repo.Find<AssessorSView>(assessor => assessor.Id == id).FirstOrDefaultAsync() ??
                   throw new ModelNotFoundException($"Not Found {nameof(Assessor)} with id {id}"));
     }
     [HttpGet]
-    [SwaggerResponse(200,"Assessor view page", typeof(PagingResponse<AssessorSView>))]
+    [SwaggerResponse(200, "Assessor view page", typeof(PagingResponse<AssessorSView>))]
     public async Task<ActionResult<PagingResponse<AssessorSView>>> Get(
         [FromQuery] FindAssessor request,
         [FromQuery] PagingRequest paging,
@@ -51,19 +52,19 @@ public class AssessorController: ControllerBase
     }
 
     [HttpPost]
-    [SwaggerResponse(200,"Assessor", typeof(Assessor))]
-    public async Task<ActionResult<Assessor>> Create([FromBody] CreateAssessor request)
+    [SwaggerResponse(200, "Assessor", typeof(Assessor))]
+    public async Task<ActionResult<Assessor>> Create([FromBody] CreateAssessor request, [FromClaim("Id")] int? userId)
     {
-        return Ok(await _assessorService.CreateAsync(request));
+        return Ok(await _assessorService.CreateAsync(request, userId));
     }
-    [HttpPut("{id:int}")] 
-    [SwaggerResponse(200,"Assessor", typeof(Assessor))]
+    [HttpPut("{id:int}")]
+    [SwaggerResponse(200, "Assessor", typeof(Assessor))]
     public async Task<ActionResult<Assessor>> Update([FromBody] UpdateAssessor request, int id)
     {
         return Ok(await _assessorService.UpdateAsync(id, request));
     }
     [HttpDelete("{id:int}")]
-    [SwaggerResponse(200,"Assessor", typeof(Assessor))]
+    [SwaggerResponse(200, "Assessor", typeof(Assessor))]
     public async Task<ActionResult<Assessor>> Delete(int id)
     {
         return Ok(await _assessorService.UpdateAsync(id, new SoftDeleteDto<Assessor>()));

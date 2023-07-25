@@ -11,7 +11,7 @@ using VehicleReSell.Data.Model;
 
 namespace VehicleReSell.Business.DTO.ItemReceiptDto;
 
-public class ItemReceiptSView :BaseModel,  IView<ItemReceipt>, IDto
+public class ItemReceiptSView : BaseModel, IView<ItemReceipt>, IDto
 {
     public int Id { get; set; }
 
@@ -23,6 +23,7 @@ public class ItemReceiptSView :BaseModel,  IView<ItemReceipt>, IDto
 
     public ItemReceiptStatus ItemReceiptStatus { get; set; }
 
+    public VehicleOwnerSView? VehicleOwner { get; set; }
     public UserSView? Approver { get; set; }
     public string? Request { get; set; }
 

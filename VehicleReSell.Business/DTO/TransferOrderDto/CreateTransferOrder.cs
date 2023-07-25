@@ -13,19 +13,27 @@ public class CreateTransferOrder : CreateDto, ICreateRequest<TransferOrder>
 {
     [FromClaim("StaffId")]
     public int? StaffId { get; set; }
-    
+
     [AdaptIgnore]
     public CreateTransaction? Transaction { get; set; }
     public int? TransactionId { get; set; }
 
     public int? FromLocationId { get; set; }
-    public string FromLocationAddress { get; set; }  
+    public string FromLocationAddress { get; set; }
     public DateTime? LeaveDate { get; set; }
 
     public int? ToLocationId { get; set; }
-    public string ToLocationAddress { get; set; }  
+    public string ToLocationAddress { get; set; }
     public DateTime? ReceiveDate { get; set; }
+    public int? SaleOrderId { get; set; }
+
+    public int? ItemReceiptId { get; set; }
+
+    public int? ApproverId { get; set; }
+
     public ApprovalStatus? ApprovalStatus => Data.Model.ApprovalStatus.Open;
+
+    public TransferOrderType? TransferOrderType { get; set; }
     public async Task<TransferOrder> CreateNewAsync(IUnitOfWork work)
     {
         if (Transaction is null) return await Task.FromResult(this.Adapt<TransferOrder>());

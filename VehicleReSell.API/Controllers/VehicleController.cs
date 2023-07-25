@@ -1,3 +1,4 @@
+using CrudApiTemplate.CustomBinding;
 using CrudApiTemplate.CustomException;
 using CrudApiTemplate.Model;
 using CrudApiTemplate.Repository;
@@ -29,14 +30,14 @@ public class VehicleController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [SwaggerResponse(200,"Vehicle view", typeof(VehicleView))]
+    [SwaggerResponse(200, "Vehicle view", typeof(VehicleView))]
     public async Task<ActionResult<VehicleView>> Get(int id)
     {
         return Ok(await _repo.Find<VehicleView>(vehicle => vehicle.Id == id).FirstOrDefaultAsync() ??
                   throw new ModelNotFoundException($"Not Found {nameof(Vehicle)} with id {id}"));
     }
     [HttpGet]
-    [SwaggerResponse(200,"Vehicle view page", typeof(PagingResponse<VehicleView>))]
+    [SwaggerResponse(200, "Vehicle view page", typeof(PagingResponse<VehicleView>))]
     public async Task<ActionResult<PagingResponse<VehicleView>>> Get(
         [FromQuery] FindVehicle request,
         [FromQuery] PagingRequest paging,
@@ -49,13 +50,17 @@ public class VehicleController : ControllerBase
             PagingRequest = paging
         });
 
-        return Ok(( vehicleViews, total).ToPagingResponse(paging));
+        return Ok((vehicleViews, total).ToPagingResponse(paging));
     }
 
     [HttpPost]
-    [SwaggerResponse(200,"Create Vehicle", typeof(Vehicle))]
-    public async Task<ActionResult<Vehicle>> Create([FromBody] CreateVehicle request)
+    [SwaggerResponse(200, "Create Vehicle", typeof(Vehicle))]
+    public async Task<ActionResult<Vehicle>> Create([FromBody] CreateVehicle request, [FromClaim("AssessorId")] int? assessorId)
     {
+        if (assessorId.HasValue)
+        {
+            request.AssessorId = assessorId.Value;
+        }
         var vehicle = await _vehicleService.CreateAsync(request);
 
         await _work.Get<VehicleImg>().AddAllAsync(request.VehicleImgs.Select(i => new VehicleImg()
@@ -65,14 +70,14 @@ public class VehicleController : ControllerBase
         }));
         return Ok(await _vehicleService.GetAsync<VehicleView>(vehicle.Id));
     }
-    [HttpPut("{id:int}")] 
-    [SwaggerResponse(200,"Update Vehicle", typeof(Vehicle))]
+    [HttpPut("{id:int}")]
+    [SwaggerResponse(200, "Update Vehicle", typeof(Vehicle))]
     public async Task<ActionResult<Vehicle>> Update([FromBody] UpdateVehicle request, int id)
     {
         return Ok(await _vehicleService.UpdateAsync(id, request));
     }
     [HttpDelete("{id:int}")]
-    [SwaggerResponse(200,"Soft Delete Vehicle", typeof(Vehicle))]
+    [SwaggerResponse(200, "Soft Delete Vehicle", typeof(Vehicle))]
     public async Task<ActionResult<Vehicle>> Delete(int id)
     {
         return Ok(await _vehicleService.UpdateAsync(id, new SoftDeleteDto<Vehicle>()));

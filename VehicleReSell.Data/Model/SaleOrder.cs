@@ -13,7 +13,12 @@ public class SaleOrder : BaseModel, IOrderAble
 
     public int? CustomerId { get; set; }
     public Customer? Customer { get; set; }
-    
+
+
+    public int? ApproverId { get; set; }
+
+    public User? Approver { get; set; }
+
     public ApprovalStatus ApprovalStatus { get; set; }
 
     public string? Note { get; set; }

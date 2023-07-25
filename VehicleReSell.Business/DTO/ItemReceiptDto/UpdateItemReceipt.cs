@@ -8,7 +8,6 @@ namespace VehicleReSell.Business.DTO.ItemReceiptDto;
 
 public class UpdateItemReceipt : UpdateDto, IUpdateRequest<ItemReceipt>
 {
-    public int Id { get; set; }
     [AdaptIgnore]
     public UpdateTransaction? Transaction { get; set; }
 
@@ -20,7 +19,7 @@ public class UpdateItemReceipt : UpdateDto, IUpdateRequest<ItemReceipt>
     public ItemReceiptStatus ItemReceiptStatus { get; set; }
 
     public int? Approver { get; set; }
-    
+
     public string? Request { get; set; }
 
     public string? Img { get; set; }

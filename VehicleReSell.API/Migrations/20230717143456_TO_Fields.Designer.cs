@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VehicleReSell.Data.Repository;
 
@@ -11,9 +12,10 @@ using VehicleReSell.Data.Repository;
 namespace VehicleReSell.API.Migrations
 {
     [DbContext(typeof(VehicleReSellDbContext))]
-    partial class VehicleReSellDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230717143456_TO_Fields")]
+    partial class TO_Fields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -288,9 +290,6 @@ namespace VehicleReSell.API.Migrations
                     b.Property<int>("ApprovalStatus")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ApproverId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("CreateAt")
                         .HasColumnType("datetime2");
 
@@ -325,8 +324,6 @@ namespace VehicleReSell.API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApproverId");
 
                     b.HasIndex("CustomerId");
 
@@ -564,9 +561,6 @@ namespace VehicleReSell.API.Migrations
                     b.Property<int>("ApprovalStatus")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ApproverId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("CreateAt")
                         .HasColumnType("datetime2");
 
@@ -580,6 +574,7 @@ namespace VehicleReSell.API.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("FromLocationAddress")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("FromLocationId")
@@ -604,15 +599,13 @@ namespace VehicleReSell.API.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ToLocationAddress")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ToLocationId")
                         .HasColumnType("int");
 
                     b.Property<int?>("TransactionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TransferOrderType")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateAt")
@@ -622,8 +615,6 @@ namespace VehicleReSell.API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApproverId");
 
                     b.HasIndex("FromLocationId");
 
@@ -995,11 +986,6 @@ namespace VehicleReSell.API.Migrations
 
             modelBuilder.Entity("VehicleReSell.Data.Model.SaleOrder", b =>
                 {
-                    b.HasOne("VehicleReSell.Data.Model.User", "Approver")
-                        .WithMany()
-                        .HasForeignKey("ApproverId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("VehicleReSell.Data.Model.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
@@ -1014,8 +1000,6 @@ namespace VehicleReSell.API.Migrations
                         .WithMany()
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Approver");
 
                     b.Navigation("Customer");
 
@@ -1078,11 +1062,6 @@ namespace VehicleReSell.API.Migrations
 
             modelBuilder.Entity("VehicleReSell.Data.Model.TransferOrder", b =>
                 {
-                    b.HasOne("VehicleReSell.Data.Model.User", "Approver")
-                        .WithMany()
-                        .HasForeignKey("ApproverId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("VehicleReSell.Data.Model.WareHouse", "FromLocation")
                         .WithMany()
                         .HasForeignKey("FromLocationId")
@@ -1112,8 +1091,6 @@ namespace VehicleReSell.API.Migrations
                         .WithMany()
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Approver");
 
                     b.Navigation("FromLocation");
 

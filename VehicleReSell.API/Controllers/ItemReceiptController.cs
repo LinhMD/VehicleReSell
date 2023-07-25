@@ -1,3 +1,4 @@
+using CrudApiTemplate.CustomBinding;
 using CrudApiTemplate.CustomException;
 using CrudApiTemplate.Model;
 using CrudApiTemplate.Repository;
@@ -32,14 +33,14 @@ public class ItemReceiptController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [SwaggerResponse(200,"ItemReceipt view", typeof(ItemReceiptSView))]
+    [SwaggerResponse(200, "ItemReceipt view", typeof(ItemReceiptSView))]
     public async Task<ActionResult<ItemReceiptSView>> Get(int id)
     {
         return Ok(await _repo.Find<ItemReceiptSView>(itemReceipt => itemReceipt.Id == id).FirstOrDefaultAsync() ??
                   throw new ModelNotFoundException($"Not Found {nameof(ItemReceipt)} with id {id}"));
     }
     [HttpGet]
-    [SwaggerResponse(200,"ItemReceipt view page", typeof(PagingResponse<ItemReceiptSView>))]
+    [SwaggerResponse(200, "ItemReceipt view page", typeof(PagingResponse<ItemReceiptSView>))]
     public async Task<ActionResult<PagingResponse<ItemReceiptSView>>> Get(
         [FromQuery] FindItemReceipt request,
         [FromQuery] PagingRequest paging,
@@ -56,13 +57,14 @@ public class ItemReceiptController : ControllerBase
     }
 
     [HttpPost]
-    [SwaggerResponse(200,"Create ItemReceipt", typeof(ItemReceipt))]
-    public async Task<ActionResult<ItemReceiptSView>> Create([FromBody] CreateItemReceipt request)
+    [SwaggerResponse(200, "Create ItemReceipt", typeof(ItemReceipt))]
+    public async Task<ActionResult<ItemReceiptSView>> Create([FromBody] CreateItemReceipt request, [FromClaim("StaffId")] int? staffId)
     {
+        request.StaffId = staffId;
         return Ok((await _itemReceiptService.CreateAsync(request)).Adapt<ItemReceiptSView>());
     }
-    [HttpPut("{id:int}")] 
-    [SwaggerResponse(200,"Update ItemReceipt", typeof(ItemReceipt))]
+    [HttpPut("{id:int}")]
+    [SwaggerResponse(200, "Update ItemReceipt", typeof(ItemReceipt))]
     public async Task<ActionResult<ItemReceipt>> Update([FromBody] UpdateItemReceipt request, int id)
     {
         if (request.ItemReceiptStatus == ItemReceiptStatus.Approved)
@@ -70,7 +72,7 @@ public class ItemReceiptController : ControllerBase
             var itemReceipt = await _work.Get<ItemReceipt>().GetAsync(id);
             if (itemReceipt?.TransactionId != null)
             {
-                await _transactionService.UpdateVehicleStatusAsync(itemReceipt.TransactionId.Value, 
+                await _transactionService.UpdateVehicleStatusAsync(itemReceipt.TransactionId.Value,
                     VehicleStatus.Draft,
                     VehicleStatus.Inventory);
                 await _work.Get<Transaction>().UpdateFieldAsync(t => t.TransactionStatus, new Transaction()
@@ -80,10 +82,14 @@ public class ItemReceiptController : ControllerBase
                 });
             }
         }
+        if (request.Transaction != null)
+        {
+            var transaction = await _transactionService.UpdateTransactionAsync(request.Transaction);
+        }
         return Ok(await _itemReceiptService.UpdateAsync(id, request));
     }
     [HttpDelete("{id:int}")]
-    [SwaggerResponse(200,"Soft Delete ItemReceipt", typeof(ItemReceipt))]
+    [SwaggerResponse(200, "Soft Delete ItemReceipt", typeof(ItemReceipt))]
     public async Task<ActionResult<ItemReceipt>> Delete(int id)
     {
         var itemReceipt = await _work.Get<ItemReceipt>().GetAsync(id);

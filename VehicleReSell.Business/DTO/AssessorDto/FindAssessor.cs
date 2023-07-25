@@ -8,11 +8,8 @@ namespace VehicleReSell.Business.DTO.AssessorDto;
 
 public class FindAssessor : FindEntity, IFindRequest<Assessor>
 {
-    
+
     public int? UserId { get; set; }
-    
-    [FromClaim("Id")]
-    [Equal("UserId")]
-    public int? UserIdHidden { get; set; }
-    
+
+
 }

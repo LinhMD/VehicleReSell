@@ -1,3 +1,4 @@
+using CrudApiTemplate.Attributes.Update;
 using CrudApiTemplate.Model;
 using CrudApiTemplate.Request;
 using VehicleReSell.Business.DTO.TransactionLineDto;
@@ -7,18 +8,20 @@ namespace VehicleReSell.Business.DTO.TransactionDto;
 
 public class UpdateTransaction : UpdateDto, IUpdateRequest<Transaction>
 {
+
+    [UpdateIgnore]
     public int Id { get; set; }
-    public string TransactionName { get; set; }  
+    public string? TransactionName { get; set; }
 
-    public long TotalAmount { get; set; } = 0;
+    public long? TotalAmount { get; set; } = 0;
 
-    public DateTime TransactionDate { get; set; } = DateTime.Now;
+    public DateTime? TransactionDate { get; set; }
 
-    public TransactionType TransactionType { get; set; }
+    public TransactionType? TransactionType { get; set; }
 
-    public ApprovalStatus ApprovalStatus { get; set; } = ApprovalStatus.Open;
+    public ApprovalStatus? ApprovalStatus { get; set; }
 
-    public TransactionStatus TransactionStatus { get; set; } = TransactionStatus.Open;
+    public TransactionStatus? TransactionStatus { get; set; }
 
-    // public IList<UpdateLine> TransactionLines { get; set; } = new List<UpdateLine>();
+    public IList<UpdateLine>? TransactionLines { get; set; }
 }

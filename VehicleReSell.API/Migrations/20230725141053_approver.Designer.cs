@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VehicleReSell.Data.Repository;
 
@@ -11,9 +12,10 @@ using VehicleReSell.Data.Repository;
 namespace VehicleReSell.API.Migrations
 {
     [DbContext(typeof(VehicleReSellDbContext))]
-    partial class VehicleReSellDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230725141053_approver")]
+    partial class approver
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

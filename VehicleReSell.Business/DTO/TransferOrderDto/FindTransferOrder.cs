@@ -11,20 +11,20 @@ public class FindTransferOrder : IFindRequest<TransferOrder>
     public int? Id { get; set; }
 
     public int? StaffId { get; set; }
-    
+
     [FromClaim("StaffId")]
     [Equal("StaffId")]
     public int? StaffIdHidden { get; set; }
-    
+
     public int? TransactionId { get; set; }
 
     public int? FromLocationId { get; set; }
     [Contain]
-    public string? FromLocationAddress { get; set; }  
+    public string? FromLocationAddress { get; set; }
 
     public int? ToLocationId { get; set; }
     [Contain]
-    public string? ToLocationAddress { get; set; }  
+    public string? ToLocationAddress { get; set; }
     public ApprovalStatus? ApprovalStatus { get; set; }
     public ModelStatus? Status { get; set; }
 
@@ -35,4 +35,10 @@ public class FindTransferOrder : IFindRequest<TransferOrder>
 
 
     public int? DeleteById { get; set; }
+
+    public int? SaleOrderId { get; set; }
+
+    public int? ItemReceiptId { get; set; }
+
+    public TransferOrderType? TransferOrderType { get; set; }
 }

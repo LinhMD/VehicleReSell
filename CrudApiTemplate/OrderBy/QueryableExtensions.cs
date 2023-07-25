@@ -49,6 +49,17 @@ public static class QueryableExtensions
         return sortModels;
     }
 
+    public static IOrderedQueryable<TModel> ThenOrderTest<TModel, dynamic>(this IOrderedQueryable<TModel> models, OrderModel<TModel> orderModel) where TModel : class
+    {
+        var para = Expression.Parameter(typeof(TModel), typeof(TModel).Name.ToLower());
+        var member = Expression.Property(para, orderModel.PropertyName);
+        var orderExpression = Expression.Lambda<Func<TModel, dynamic>>(member, para);
+        var sortModels = orderModel.IsAscending
+            ? models.ThenBy(orderExpression)
+            : Queryable.ThenByDescending(models, orderExpression);
+        return sortModels;
+    }
+
     //It's fucked but fuk it
     //https://stackoverflow.com/questions/32146571/expression-of-type-system-int64-cannot-be-used-for-return-type-system-object
     public static IOrderedQueryable<TModel> Order<TModel>(this IQueryable<TModel> models, OrderModel<TModel> orderModel)
@@ -128,11 +139,14 @@ public static class QueryableExtensions
     {
         var para = Expression.Parameter(typeof(TModel), typeof(TModel).Name.ToLower());
         var member = Expression.Property(para, orderModel.PropertyName);
-
+        var orderExpression = Expression.Lambda<Func<TModel, dynamic>>(member, para);
 
         try
         {
-            var expression = OrderByProvider<TModel>.OrderByDic[member.Member.Name];
+
+            var expression = OrderByProvider<TModel>.OrderByDic.ContainsKey(member.Member.Name)
+                ? OrderByProvider<TModel>.OrderByDic[member.Member.Name]
+                : orderExpression;
             var sortModels = orderModel.IsAscending
                 ? Queryable.ThenBy(models, expression)
                 : Queryable.ThenByDescending(models, expression);

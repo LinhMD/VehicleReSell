@@ -1,3 +1,4 @@
+using CrudApiTemplate.CustomBinding;
 using CrudApiTemplate.CustomException;
 using CrudApiTemplate.Model;
 using CrudApiTemplate.Repository;
@@ -32,14 +33,14 @@ public class TransferOrderController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [SwaggerResponse(200,"TransferOrder view", typeof(TransferOrderSView))]
+    [SwaggerResponse(200, "TransferOrder view", typeof(TransferOrderSView))]
     public async Task<ActionResult<TransferOrderSView>> Get(int id)
     {
         return Ok(await _repo.Find<TransferOrderSView>(transferOrder => transferOrder.Id == id).FirstOrDefaultAsync() ??
                   throw new ModelNotFoundException($"Not Found {nameof(TransferOrder)} with id {id}"));
     }
     [HttpGet]
-    [SwaggerResponse(200,"TransferOrder view page", typeof(PagingResponse<TransferOrderSView>))]
+    [SwaggerResponse(200, "TransferOrder view page", typeof(PagingResponse<TransferOrderSView>))]
     public async Task<ActionResult<PagingResponse<TransferOrderSView>>> Get(
         [FromQuery] FindTransferOrder request,
         [FromQuery] PagingRequest paging,
@@ -56,23 +57,26 @@ public class TransferOrderController : ControllerBase
     }
 
     [HttpPost]
-    [SwaggerResponse(200,"Create TransferOrder", typeof(TransferOrder))]
-    public async Task<ActionResult<TransferOrder>> Create([FromBody] CreateTransferOrder request)
+    [SwaggerResponse(200, "Create TransferOrder", typeof(TransferOrder))]
+    public async Task<ActionResult<TransferOrder>> Create([FromBody] CreateTransferOrder request, [FromClaim("StaffId")] int? staffId)
     {
+        request.StaffId = staffId;
         return Ok(await _transferOrderService.CreateAsync(request));
     }
-    [HttpPut("{id:int}")] 
-    [SwaggerResponse(200,"Update TransferOrder", typeof(TransferOrder))]
+    [HttpPut("{id:int}")]
+    [SwaggerResponse(200, "Update TransferOrder", typeof(TransferOrder))]
     public async Task<ActionResult<TransferOrder>> Update([FromBody] UpdateTransferOrder request, int id)
     {
+        var transferOrderUpdate = await _transferOrderService.UpdateAsync(id, request);
         if (request.ApprovalStatus == ApprovalStatus.Approved)
         {
             var transferOrder = await _work.Get<TransferOrder>().GetAsync(id);
             if (transferOrder?.TransactionId != null)
             {
-                await _transactionService.UpdateVehicleStatusAsync(transferOrder.TransactionId.Value, 
-                    VehicleStatus.Order,
-                    VehicleStatus.Sold);
+                if (transferOrder.ToLocationId != null)
+                {
+                    await _transactionService.UpdateVehicleLocationAsync(transferOrder.TransactionId.Value, transferOrder.ToLocationId.Value);
+                }
                 await _work.Get<Transaction>().UpdateFieldAsync(t => t.TransactionStatus, new Transaction()
                 {
                     Id = transferOrder.TransactionId.Value,
@@ -80,10 +84,14 @@ public class TransferOrderController : ControllerBase
                 });
             }
         }
-        return Ok(await _transferOrderService.UpdateAsync(id, request));
+        if (request.Transaction != null)
+        {
+            var transaction = await _transactionService.UpdateTransactionAsync(request.Transaction);
+        }
+        return Ok(transferOrderUpdate);
     }
     [HttpDelete("{id:int}")]
-    [SwaggerResponse(200,"Soft Delete TransferOrder", typeof(TransferOrder))]
+    [SwaggerResponse(200, "Soft Delete TransferOrder", typeof(TransferOrder))]
     public async Task<ActionResult<TransferOrder>> Delete(int id)
     {
         var transferOrder = await _transferOrderService.UpdateAsync(id, new SoftDeleteDto<TransferOrder>());
